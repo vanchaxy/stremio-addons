@@ -1,0 +1,52 @@
+image:
+  repository: registry.ivanchenko.io/library/stremio-addons
+  pullPolicy: IfNotPresent
+  tag: main
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+eneyidaProxySecret: ~
+
+podAnnotations: {}
+
+podSecurityContext: {}
+
+securityContext: {}
+
+service:
+  type: ClusterIP
+  port: 8000
+
+ingress:
+  enabled: true
+  className: ""
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/force-ssl-redirect: 'true'
+    nginx.ingress.kubernetes.io/ssl-passthrough: 'true'
+  hosts:
+    - host: stremio.ivanchenko.io
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: stremio-tls
+      hosts:
+        - stremio.ivanchenko.io
+
+resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

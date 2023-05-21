@@ -1,0 +1,31 @@
+kind: pipeline
+type: kubernetes
+name: default
+
+steps:
+  - name: docker
+    image: plugins/docker
+    settings:
+      username:
+        from_secret: REGISTRY_USERNAME
+      password:
+        from_secret: REGISTRY_PASSWORD
+      registry: registry.ivanchenko.io
+      repo: registry.ivanchenko.io/library/${DRONE_REPO_NAME}
+      cache_from: registry.ivanchenko.io/library/${DRONE_REPO_NAME}:main
+      tags:
+        - ${DRONE_BRANCH/\//-}
+        - ${DRONE_BRANCH/\//-}-${DRONE_COMMIT:0:8}
+      mtu: 1000
+
+  - name: helm
+    image: alpine/helm:3.10.0
+    environment:
+      REGISTRY_USERNAME:
+        from_secret: REGISTRY_USERNAME
+      REGISTRY_PASSWORD:
+        from_secret: REGISTRY_PASSWORD
+    commands:
+      - helm registry login registry.ivanchenko.io -u $${REGISTRY_USERNAME} -p $${REGISTRY_PASSWORD}
+      - chart=$$(helm package chart)
+      - helm push $$(basename $${chart#*/}) oci://registry.ivanchenko.io/library
