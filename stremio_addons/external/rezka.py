@@ -106,7 +106,7 @@ def get_article_translators(article_tree, language):
         else:
             flag_code = "ru"
 
-        if language != "all" and flag_code != language:
+        if language != "all" and flag_code not in (language, "*"):
             continue
 
         translators[element.attrib["data-translator_id"]] = "\n".join(
@@ -126,13 +126,13 @@ def get_player_type(article_tree):
 
 
 async def get_article_streams(
-        http,
-        article_id,
-        translators,
-        player_type,
-        stremio_type,
-        season,
-        episode,
+    http,
+    article_id,
+    translators,
+    player_type,
+    stremio_type,
+    season,
+    episode,
 ):
     data = {
         "id": article_id,
@@ -155,10 +155,23 @@ async def get_article_streams(
 @backoff.on_exception(backoff.expo, Exception)
 async def get_stream_url(http, data):
     async with http.post(
-            "https://rezkify.com/ajax/get_cdn_series/",
-            data=data,
+        "https://rezkify.com/ajax/get_cdn_series/",
+        data=data,
     ) as response:
         if response.status == 503:
-            raise Exception('503')
+            raise Exception("503")
         text = await response.text()
-        return clear_trash(loads(text)["url"]).split(" ")[-1]
+
+    best_quality_stream = clear_trash(loads(text)["url"]).split(",")[-1]
+    stream_url = re.findall(
+        r"(?:https?:\/\/)?(?:(?i:[a-z]+\.)+)[^\s,]+",
+        best_quality_stream,
+    )[0]
+
+    if stream_url.endswith("mp4"):
+        async with http.get(stream_url, allow_redirects=False) as response:
+            if response.status == 503:
+                raise Exception("503")
+            if location := response.headers.get("Location"):
+                stream_url = location
+    return stream_url
