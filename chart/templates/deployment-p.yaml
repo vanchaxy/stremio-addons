@@ -1,13 +1,14 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "stremio-addons.fullname" . }}
+  name: {{ include "stremio-addons.fullname" . }}-proxy
   labels:
     {{- include "stremio-addons.labels" . | nindent 4 }}
 spec:
   selector:
     matchLabels:
-      {{- include "stremio-addons.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/name: {{ include "stremio-addons.name" . }}-proxy
+      app.kubernetes.io/instance: {{ .Release.Name }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -15,7 +16,8 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "stremio-addons.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/name: {{ include "stremio-addons.name" . }}-proxy
+        app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -24,22 +26,14 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ .Chart.Name }}
+        - name: {{ .Chart.Name }}-proxy
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          image: "{{ .Values.image.repository }}:{{ .Values.image.proxyTag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          {{- if .Values.eneyidaProxySecret }}
-          env:
-            - name: ENEYIDA_PROXY
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.eneyidaProxySecret }}
-                  key: ENEYIDA_PROXY
-          {{- end }}
           ports:
-            - name: http
-              containerPort: {{ .Values.service.port }}
+            - name: proxy
+              containerPort: {{ .Values.service.proxyPort }}
               protocol: TCP
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
