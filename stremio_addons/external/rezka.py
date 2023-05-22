@@ -155,7 +155,7 @@ async def get_article_streams(
     return streams
 
 
-# @backoff.on_exception(backoff.expo, Exception)
+@backoff.on_exception(backoff.expo, Exception)
 async def get_stream_url(http, data):
     async with http.post(
         f"https://rezkify.com/ajax/get_cdn_series/?t={int(time.time() * 1000)}",
@@ -186,6 +186,8 @@ async def get_stream_url(http, data):
                 stream_url = url
             if stream_url:
                 stream_url = URL(stream_url)
-                stream_url = stream_url.update_query(host=stream_url.host)
+                stream_url = stream_url.with_path(
+                    f"/rezka/proxy/{stream_url.host}{stream_url.path}"
+                )
                 stream_url = stream_url.with_host(settings.REZKA_PROXY_HOST)
                 return str(stream_url)
