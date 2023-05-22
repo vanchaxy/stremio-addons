@@ -54,12 +54,10 @@ async def stream(
         return StreamsResponse(streams=[])
 
     translators = get_article_translators(article_tree, language)
-    player_type = get_player_type(article_tree)
     streams = await get_article_streams(
         http,
         article_id,
         translators,
-        player_type,
         stremio_type,
         season,
         episode,

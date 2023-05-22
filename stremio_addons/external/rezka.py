@@ -1,4 +1,5 @@
 import re
+import time
 import urllib.parse
 from binascii import a2b_base64
 from json import loads
@@ -129,7 +130,6 @@ async def get_article_streams(
     http,
     article_id,
     translators,
-    player_type,
     stremio_type,
     season,
     episode,
@@ -148,30 +148,32 @@ async def get_article_streams(
     for translator, title in translators.items():
         data["translator_id"] = translator
         stream_url = await get_stream_url(http, data)
-        streams.append({"url": stream_url, "title": title})
+        if stream_url:
+            streams.append({"url": stream_url, "title": title})
     return streams
 
 
 @backoff.on_exception(backoff.expo, Exception)
 async def get_stream_url(http, data):
     async with http.post(
-        "https://rezkify.com/ajax/get_cdn_series/",
+        f"https://rezkify.com/ajax/get_cdn_series/?t={int(time.time() * 1000)}",
         data=data,
     ) as response:
         if response.status == 503:
             raise Exception("503")
         text = await response.text()
-
-    best_quality_stream = clear_trash(loads(text)["url"]).split(",")[-1]
-    stream_url = re.findall(
+    json = loads(text)
+    if not json["success"]:
+        return
+    best_quality_stream = clear_trash(json["url"]).split(",")[-1]
+    stream_urls = re.findall(
         r"(?:https?:\/\/)?(?:(?i:[a-z]+\.)+)[^\s,]+",
         best_quality_stream,
-    )[0]
+    )
 
-    if stream_url.endswith("mp4"):
-        async with http.get(stream_url, allow_redirects=False) as response:
-            if response.status == 503:
-                raise Exception("503")
+    for url in stream_urls:
+        async with http.get(url, allow_redirects=False) as response:
             if location := response.headers.get("Location"):
-                stream_url = location
-    return stream_url
+                return location
+            if response.status == 200:
+                return location
