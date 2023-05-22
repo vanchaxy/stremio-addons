@@ -4,6 +4,7 @@ import re
 import lxml.html
 from asyncer import asyncify
 from unidecode import unidecode
+from yarl import URL
 
 from stremio_addons.config import settings
 
@@ -86,11 +87,13 @@ async def get_article_source(http, source_url):
             return re.findall(r'file:[\'"](.+)[\'"],\n', text)[0]
 
 
-def create_article_streams(source, name, year, stremio_type, season, episode):
+def create_article_streams(
+    source, name, year, stremio_type, season, episode, use_proxy
+):
     base_title = f"{name}\n{year}"
 
     if source.startswith("http"):
-        return [{"url": source, "title": base_title}]
+        streams = [{"url": source, "title": base_title}]
     else:
         streams = []
         source = json.loads(source)
@@ -125,4 +128,14 @@ def create_article_streams(source, name, year, stremio_type, season, episode):
                                 "url": episode_source["file"],
                             }
                         )
+
+    if use_proxy:
+        for stream in streams:
+            stream_url = stream["url"]
+            stream_url = URL(stream_url)
+            stream_url = stream_url.with_path(
+                f"/proxy/{stream_url.host}{stream_url.path}"
+            )
+            stream_url = stream_url.with_host(settings.REZKA_PROXY_HOST)
+            stream["url"] = str(stream_url)
     return streams

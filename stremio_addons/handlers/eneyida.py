@@ -19,23 +19,30 @@ router = APIRouter(
 )
 
 
-@router.get("/manifest.json")
-async def manifest():
+@router.get("/{use_proxy}/manifest.json")
+async def manifest(use_proxy: str):
+    if use_proxy == "proxy":
+        proxy = "[proxy] "
+        addon_id = "io.ivanchenko.eneyida_proxy"
+    else:
+        proxy = ""
+        addon_id = "io.ivanchenko.eneyida"
     return {
-        "id": "io.ivanchenko.eneyida",
+        "id": addon_id,
         "version": "0.0.1",
-        "description": "Play movies and series from eneyida.tv",
-        "name": "eneyida.tv",
+        "description": "Play movies and series from eneyida.tv {proxy}",
+        "name": f"eneyida.tv{proxy}",
         "resources": ["stream"],
         "types": ["movie", "series"],
         "catalogs": [],
     }
 
 
-@router.get("/stream/{stremio_type}/{stremio_id}.json")
+@router.get("/{use_proxy}/stream/{stremio_type}/{stremio_id}.json")
 async def stream(
     stremio_type: Annotated[StremioType, Path(title="Stremio type")],
     stremio_id: Annotated[str, Path(title="Stremio id")],
+    use_proxy: str,
     http: Annotated[ClientSession, Depends(get_http_client)],
     cloudflare: Annotated[CloudScraper, Depends(get_cloudflare_client)],
 ) -> StreamsResponse:
@@ -61,5 +68,6 @@ async def stream(
         stremio_type=stremio_type,
         season=season,
         episode=episode,
+        use_proxy=use_proxy == "proxy",
     )
     return StreamsResponse(streams=article_streams)
