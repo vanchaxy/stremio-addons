@@ -28,10 +28,10 @@ steps:
         from_secret: REGISTRY_PASSWORD
       registry: registry.ivanchenko.io
       repo: registry.ivanchenko.io/library/${DRONE_REPO_NAME}
-      cache_from: registry.ivanchenko.io/library/${DRONE_REPO_NAME}:main
+      cache_from: registry.ivanchenko.io/library/${DRONE_REPO_NAME}:main-proxy
       tags:
-        - ${DRONE_BRANCH/\//-}
-        - ${DRONE_BRANCH/\//-}-${DRONE_COMMIT:0:8}
+        - ${DRONE_BRANCH/\//-}-proxy
+        - ${DRONE_BRANCH/\//-}-proxy-${DRONE_COMMIT:0:8}
       mtu: 1000
 
   - name: helm
