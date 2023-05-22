@@ -187,5 +187,5 @@ async def get_stream_url(http, data):
                 stream_url = stream_url.with_path(
                     f"/proxy/{stream_url.host}{stream_url.path}"
                 )
-                stream_url = stream_url.with_host(settings.REZKA_PROXY_HOST)
+                stream_url = stream_url.with_host(settings.PROXY_HOST)
                 return str(stream_url)

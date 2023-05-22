@@ -136,6 +136,6 @@ def create_article_streams(
             stream_url = stream_url.with_path(
                 f"/proxy/{stream_url.host}{stream_url.path}"
             )
-            stream_url = stream_url.with_host(settings.REZKA_PROXY_HOST)
+            stream_url = stream_url.with_host(settings.PROXY_HOST)
             stream["url"] = str(stream_url)
     return streams
