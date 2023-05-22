@@ -165,20 +165,18 @@ async def get_stream_url(http, data):
             raise Exception("503")
         text = await response.text()
     json = loads(text)
-    print(json)
+
     if not json["success"]:
         return
     best_quality_stream = clear_trash(json["url"]).split(",")[-1]
-    print(best_quality_stream)
+
     stream_urls = re.findall(
         r"(?:https?:\/\/)?(?:(?i:[a-z]+\.)+)[^\s,]+",
         best_quality_stream,
     )
-    print(stream_urls)
 
     for url in stream_urls:
         async with http.get(url, allow_redirects=False) as response:
-            print(response)
             stream_url = None
             if location := response.headers.get("Location"):
                 stream_url = location
