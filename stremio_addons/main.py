@@ -5,7 +5,7 @@ from cloudscraper import create_scraper, user_agent
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from stremio_addons.handlers import eneyida_router, rezka_router
+from stremio_addons.handlers import eneyida_router, proxy_router, rezka_router
 
 
 @asynccontextmanager
@@ -38,3 +38,4 @@ app.add_middleware(
 
 app.include_router(rezka_router)
 app.include_router(eneyida_router)
+app.include_router(proxy_router)
