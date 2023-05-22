@@ -18,7 +18,7 @@ securityContext: {}
 
 service:
   type: ClusterIP
-  port: 8000
+  port: 7777
   proxyPort: 8888
 
 ingress:
@@ -34,7 +34,7 @@ ingress:
       paths:
         - path: /
           pathType: Prefix
-          svcPort: 8000
+          svcPort: 7777
     - host: rezka-proxy.ivanchenko.io
       paths:
         - path: /
