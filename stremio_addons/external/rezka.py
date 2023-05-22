@@ -3,9 +3,11 @@ import time
 import urllib.parse
 from binascii import a2b_base64
 from json import loads
+
 import backoff
 import lxml.html
 from unidecode import unidecode
+from yarl import URL
 
 from stremio_addons.config import settings
 
@@ -173,7 +175,13 @@ async def get_stream_url(http, data):
 
     for url in stream_urls:
         async with http.get(url, allow_redirects=False) as response:
+            stream_url = None
             if location := response.headers.get("Location"):
-                return location
+                stream_url = location
             if response.status == 200:
-                return location
+                stream_url = url
+            if stream_url:
+                stream_url = URL(stream_url)
+                stream_url = stream_url.update_query(host=url.host)
+                stream_url = stream_url.with_host(settings.REZKA_PROXY_HOST)
+                return str(stream_url)

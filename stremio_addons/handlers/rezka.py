@@ -6,10 +6,9 @@ from fastapi import APIRouter, Depends, Path
 from stremio_addons.dependencies import get_http_client
 from stremio_addons.external.cinemeta import get_name_and_year
 from stremio_addons.external.rezka import (
+    get_article_streams,
     get_article_translators,
     get_article_tree,
-    get_player_type,
-    get_article_streams,
 )
 from stremio_addons.models import StreamsResponse, StremioType
 
