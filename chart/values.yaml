@@ -2,7 +2,6 @@ image:
   repository: registry.ivanchenko.io/library/stremio-addons
   pullPolicy: IfNotPresent
   tag: main
-  proxyTag: main-proxy
 
 imagePullSecrets: []
 nameOverride: ""
@@ -19,7 +18,6 @@ securityContext: {}
 service:
   type: ClusterIP
   port: 7777
-  proxyPort: 8888
 
 ingress:
   enabled: true
@@ -35,16 +33,10 @@ ingress:
         - path: /
           pathType: Prefix
           svcPort: 7777
-    - host: rezka-proxy.ivanchenko.io
-      paths:
-        - path: /
-          pathType: Prefix
-          svcPort: 8888
   tls:
     - secretName: stremio-tls
       hosts:
         - stremio.ivanchenko.io
-        - rezka-proxy.ivanchenko.io
 
 resources: {}
   # limits:
