@@ -27,6 +27,7 @@ async def path(
 ):
     url = URL.build(scheme="https", host=host, path="/" + real_path)
     client_response = await http.get(url)
+
     if real_path.endswith("hls/index.m3u8"):
         context = await client_response.text()
         proxy_prefix = URL.build(

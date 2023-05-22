@@ -53,6 +53,7 @@ async def stream(
         return StreamsResponse(streams=[])
 
     translators = get_article_translators(article_tree, language)
+    addon_id = f"io.ivanchenko.rezka_{language}"
     streams = await get_article_streams(
         http,
         article_id,
@@ -60,6 +61,7 @@ async def stream(
         stremio_type,
         season,
         episode,
+        addon_id,
     )
 
     return StreamsResponse(streams=streams)

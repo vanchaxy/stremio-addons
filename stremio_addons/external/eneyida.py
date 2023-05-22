@@ -90,10 +90,21 @@ async def get_article_source(http, source_url):
 def create_article_streams(
     source, name, year, stremio_type, season, episode, use_proxy
 ):
+    if use_proxy:
+        addon_id = "io.ivanchenko.eneyida_proxy"
+    else:
+        addon_id = "io.ivanchenko.eneyida"
+
     base_title = f"{name}\n{year}"
 
     if source.startswith("http"):
-        streams = [{"url": source, "title": base_title}]
+        streams = [
+            {
+                "url": source,
+                "title": base_title,
+                "behaviorHints": {"bingeGroup": addon_id},
+            }
+        ]
     else:
         streams = []
         source = json.loads(source)
@@ -106,6 +117,9 @@ def create_article_streams(
                     {
                         "title": title,
                         "url": dubbing["file"],
+                        "behaviorHints": {
+                            "bingeGroup": f"{addon_id}-{dubbing['title']}",
+                        },
                     }
                 )
 
@@ -126,6 +140,9 @@ def create_article_streams(
                             {
                                 "title": title,
                                 "url": episode_source["file"],
+                                "behaviorHints": {
+                                    "bingeGroup": f"{addon_id}-{dubbing['title']}",
+                                },
                             }
                         )
 

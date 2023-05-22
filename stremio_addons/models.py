@@ -11,6 +11,7 @@ class StremioType(str, Enum):
 class Stream(BaseModel):
     title: str
     url: str
+    behaviorHints: dict
 
 
 class StreamsResponse(BaseModel):

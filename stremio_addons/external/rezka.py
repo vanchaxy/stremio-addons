@@ -135,13 +135,14 @@ async def get_article_streams(
     stremio_type,
     season,
     episode,
+    addon_id,
 ):
     data = {
         "id": article_id,
     }
     if stremio_type == "series":
         data["action"] = "get_stream"
-        data["season"] = (season,)
+        data["season"] = season
         data["episode"] = episode
     else:
         data["action"] = "get_movie"
@@ -151,7 +152,13 @@ async def get_article_streams(
         data["translator_id"] = translator
         stream_url = await get_stream_url(http, data)
         if stream_url:
-            streams.append({"url": stream_url, "title": title})
+            streams.append(
+                {
+                    "url": stream_url,
+                    "title": title,
+                    "behaviorHints": {"bingeGroup": f"{addon_id}_{translator}"},
+                }
+            )
     return streams
 
 
