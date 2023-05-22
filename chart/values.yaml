@@ -35,23 +35,16 @@ ingress:
         - path: /
           pathType: Prefix
           svcPort: 7777
+    - host: rezka-proxy.ivanchenko.io
+      paths:
+        - path: /
+          pathType: Prefix
+          svcPort: 8888
   tls:
     - secretName: stremio-tls
       hosts:
         - stremio.ivanchenko.io
-
-proxy:
-  ingress:
-    hosts:
-      - host: rezka-proxy.ivanchenko.io
-        paths:
-          - path: /
-            pathType: Prefix
-            svcPort: 8888
-    tls:
-      - secretName: stremio-tls
-        hosts:
-          - rezka-proxy.ivanchenko.io
+        - rezka-proxy.ivanchenko.io
 
 resources: {}
   # limits:

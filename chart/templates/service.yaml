@@ -11,5 +11,9 @@ spec:
       targetPort: http
       protocol: TCP
       name: http
+    - port: {{ .Values.service.proxyPort }}
+      targetPort: proxy
+      protocol: TCP
+      name: proxy
   selector:
     {{- include "stremio-addons.selectorLabels" . | nindent 4 }}
