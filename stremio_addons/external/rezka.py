@@ -182,6 +182,7 @@ async def get_stream_url(http, data):
         best_quality_stream,
     )
 
+    stream_urls.sort(key=lambda x: x.endswith('m3u8'), reverse=True)
     for url in stream_urls:
         async with http.get(url, allow_redirects=False) as response:
             stream_url = None
@@ -189,6 +190,7 @@ async def get_stream_url(http, data):
                 stream_url = location
             if response.status == 200:
                 stream_url = url
+
             if stream_url:
                 stream_url = URL(stream_url)
                 stream_url = stream_url.with_path(
