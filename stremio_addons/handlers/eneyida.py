@@ -30,7 +30,7 @@ async def manifest(use_proxy: str):
     return {
         "id": addon_id,
         "version": "0.0.1",
-        "description": "Play movies and series from eneyida.tv {proxy}",
+        "description": f"Play movies and series from eneyida.tv{proxy}",
         "name": f"eneyida.tv{proxy}",
         "resources": ["stream"],
         "types": ["movie", "series"],
