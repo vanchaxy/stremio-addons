@@ -17,6 +17,7 @@ steps:
         - ${DRONE_BRANCH/\//-}
         - ${DRONE_BRANCH/\//-}-${DRONE_COMMIT:0:8}
       mtu: 1000
+      depends_on: [clone]
 
   - name: nginx
     image: plugins/docker
@@ -33,6 +34,7 @@ steps:
         - ${DRONE_BRANCH/\//-}-proxy
         - ${DRONE_BRANCH/\//-}-proxy-${DRONE_COMMIT:0:8}
       mtu: 1000
+      depends_on: [clone]
 
   - name: helm
     image: alpine/helm:3.10.0
@@ -45,3 +47,4 @@ steps:
       - helm registry login registry.ivanchenko.io -u $${REGISTRY_USERNAME} -p $${REGISTRY_PASSWORD}
       - chart=$$(helm package chart)
       - helm push $$(basename $${chart#*/}) oci://registry.ivanchenko.io/library
+    depends_on: [clone]
