@@ -19,9 +19,9 @@ steps:
       mtu: 1000
 
   - name: nginx
-    dockerfile: nginx.Dockerfile
     image: plugins/docker
     settings:
+      dockerfile: nginx.Dockerfile
       username:
         from_secret: REGISTRY_USERNAME
       password:
